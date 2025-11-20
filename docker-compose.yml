@@ -1,38 +1,38 @@
 version: '3.8'
 
 services:
-  # 1. Jenkins: L'orchestratore della Pipeline CI/CD
+  # Jenkins: L'orchestratore CI/CD
   jenkins:
-    image: jenkins/jenkins:lts
-    privileged: true # Necessario per eseguire comandi Docker all'interno di Jenkins
-    user: root
+    image: jenkins/jenkins:lts # Immagine standard a lungo supporto
+    privileged: true # Necessario per eseguire Docker all'interno del container Jenkins
+    user: root # Esegue come root per avere i permessi sul socket Docker
     ports:
-      - "8080:8080" # Porta web di Jenkins
-      - "50000:50000" # Porta per i nodi slave (non usata ora, ma buona prassi)
+      - "8080:8080" 
+      - "50000:50000"
     volumes:
-      - jenkins_home:/var/jenkins_home # Persistenza dei dati di Jenkins
-      - /var/run/docker.sock:/var/run/docker.sock # Accesso all'engine Docker HOST
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # ESSENZIALE per connettersi all'engine Docker HOST
     container_name: jenkins
 
-  # 2. Prometheus: Per la raccolta delle metriche
+  # Prometheus: Sistema di raccolta metriche
   prometheus:
     image: prom/prometheus
     container_name: prometheus
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # File di configurazione
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml 
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
     ports:
-      - "9090:9090" # Porta web di Prometheus
+      - "9090:9090"
 
-  # 3. Grafana: Per la visualizzazione delle dashboard
+  # Grafana: Sistema di visualizzazione dashboard
   grafana:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "3000:3000" # Porta web di Grafana
+      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
 
